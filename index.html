@@ -447,7 +447,7 @@
     <div style="margin-bottom: 3rem;">
       <h4 class="title is-5" style="margin-bottom: 1rem;">Table 3: Computational Cost Analysis</h4>
       <figure class="image">
-        <img src="./static/images/table3.png" alt="Table 3: Method Ablation Study" style="border-radius: 4px;">
+        <img src="./static/images/table3.png" alt="Table 3: Method Ablation Study" style="border-radius: 4px; max-width: 630px; margin: 0 auto; display: block;">
       </figure>
       <p style="margin-top: 1rem; font-size: 0.95rem; color: #555;">
         Efficiency-Quality trade-off analysis on VBench. TrajeQ significantly outperforms baselines in both perceptual (LPIPS) and structural (SSIM) metrics at W3A6. With the highest Q-Score ( <i>SSIM</i> / <i>Memory</i> ) of 1.29, <strong>our method converts memory resources into substantial fidelity gains, overcoming the limitations of standard quantization methods.</strong>
@@ -670,6 +670,29 @@
 
 
 
+
+<section class="section" style="padding-top: 0rem; padding-bottom: 5rem;">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Future Work</h2>
+        <div class="content has-text-justified">
+          <p>
+            We plan to extend TrajeQ's geometric quantization framework to 3D Flow Matching, aiming to establish a unified efficient inference pipeline for spatial content.
+          </p>
+          <ul>
+            <li>
+              <strong>3D Structure Preservation:</strong> Adapting Direction-Aware Quantization to high-dimensional 3D manifolds to ensure structural integrity and topological consistency in generated 3D assets.
+            </li>
+            <li>
+              <strong>On-Device Spatial AI:</strong> Leveraging extreme low-bit compression (e.g., W4A4) to enable real-time 3D generation on resource-constrained hardware like VR/AR headsets.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- BibTeX
 <section class="section" id="BibTeX">
