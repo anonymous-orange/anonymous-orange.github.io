@@ -152,7 +152,7 @@
         <h2 class="title is-3">Abstract</h2>
         <div class="content has-text-justified">
           <p>
-           While flow matching (FM) dominates the field of high-quality video generation, its significant computational overhead presents a major obstacle to practical implementation. Although post-training quantization (PTQ) remains an established paradigm for efficient generation, we demonstrate that directly applying standard diffusion-centric methods causes severe performance degradation in FM. We identify a fundamental theoretical misalignment in how these paradigms respond to directional distortion. In contrast to stochastic diffusion, deterministic ODE trajectories cannot naturally recover from quantization error. This vulnerability induces critical angular distortion, driving the generation trajectory significantly off-manifold. To address this issue, we introduce <em><strong>TrajeQ</strong></em> to preserve the geometric integrity of the velocity field and ensure trajectory stability. Our approach introduces <em>Direction-Aware Quantization (DAQ)</em> to detect angular shifts across timesteps and mitigate geometric distortion via adaptive precision. We also integrate <em>Sensitive-Layer Preservation (SLP)</em> to protect structural bottlenecks and maintain the stability of the entire flow field. Experiments demonstrate that <em><strong>TrajeQ</strong></em> achieves SOTA VBench results and enables high-fidelity video generation even under extreme W4A4 and W3A6 quantization regimes. The code and video results are provided at https://anonymus-orange.github.io/.
+           While flow matching (FM) dominates the field of high-quality video generation, its significant computational overhead presents a major obstacle to practical implementation. Although post-training quantization (PTQ) remains an established paradigm for efficient generation, we demonstrate that directly applying standard diffusion-centric methods causes severe performance degradation in FM. We identify a fundamental theoretical misalignment in how these paradigms respond to directional distortion. In contrast to stochastic (SDE) sampling, deterministic ODE trajectories cannot naturally recover from quantization error. This vulnerability induces critical angular distortion, driving the generation trajectory significantly off-manifold. To address this issue, we introduce <em><strong>TrajeQ</strong></em> to preserve the geometric integrity of the velocity field and ensure trajectory stability. Our approach introduces <em>Direction-Aware Quantization (DAQ)</em> to detect angular shifts across timesteps and mitigate geometric distortion via adaptive precision. We also integrate <em>Sensitive-Layer Preservation (SLP)</em> to protect structural bottlenecks and maintain the stability of the entire flow field. Experiments demonstrate that <em><strong>TrajeQ</strong></em> achieves SOTA VBench results and enables high-fidelity video generation even under extreme W4A4 and W3A6 quantization regimes. The code and video results are provided at <a href="https://anonymus-orange.github.io/" target="_blank">https://anonymus-orange.github.io/</a>.
           </p>
         </div>
       </div>
@@ -594,6 +594,44 @@
           </div>
         </div>
         <h3 class="subtitle has-text-centered" style="margin-top: 1rem; margin-bottom: 0;"><strong>SmoothQuant</strong></h3>
+      </div>
+
+      <!-- Quarot Row -->
+      <div style="background-color: #f8f9fa; border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;">
+        <div class="columns" style="margin-bottom: 0.5rem;">
+          <div class="column is-half">
+            <p class="has-text-centered" style="margin-bottom: 0.5rem; font-size: 0.9rem; color: #666;"><em>"Iron Man flying in the sky"</em></p>
+            <video autoplay controls muted loop playsinline width="100%">
+              <source src="./static/videos/ironman_quarot_w4a4.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="column is-half">
+            <p class="has-text-centered" style="margin-bottom: 0.5rem; font-size: 0.9rem; color: #666;"><em>"River"</em></p>
+            <video autoplay controls muted loop playsinline width="100%">
+              <source src="./static/videos/river_quarot_w4a4.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+        <h3 class="subtitle has-text-centered" style="margin-top: 1rem; margin-bottom: 0;"><strong>QuaRot</strong></h3>
+      </div>
+
+      <!-- Q-DiT Row -->
+      <div style="background-color: #f8f9fa; border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem;">
+        <div class="columns" style="margin-bottom: 0.5rem;">
+          <div class="column is-half">
+            <p class="has-text-centered" style="margin-bottom: 0.5rem; font-size: 0.9rem; color: #666;"><em>"Iron Man flying in the sky"</em></p>
+            <video autoplay controls muted loop playsinline width="100%">
+              <source src="./static/videos/ironman_qdit_w4a4.mp4" type="video/mp4">
+            </video>
+          </div>
+          <div class="column is-half">
+            <p class="has-text-centered" style="margin-bottom: 0.5rem; font-size: 0.9rem; color: #666;"><em>"River"</em></p>
+            <video autoplay controls muted loop playsinline width="100%">
+              <source src="./static/videos/river_qdit_w4a4.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+        <h3 class="subtitle has-text-centered" style="margin-top: 1rem; margin-bottom: 0;"><strong>Q-DiT</strong></h3>
       </div>
 
       <!-- ViDiT-Q Row -->
