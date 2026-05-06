@@ -139,7 +139,7 @@
         <h2 class="title is-3">TL;DR</h2>
         <div class="content has-text-justified">
           <p style="color: #555; font-size: 1.05rem;">
-            We introduce <em><strong>TrajeQ</strong></em>, the first quantization framework for FM video. By integrating <em>Direction-Aware Quantization (DAQ)</em> and <em>Directional Bottleneck Preservation (DBP)</em>, it preserves geometric stability, enabling robust generation in low-bit settings.
+            We introduce <em><strong>TrajeQ</strong></em>, the first quantization framework for FM video. By integrating <em>Curvature-Adaptive Quantization (CAQ)</em> and <em>Directional Bottleneck Preservation (DBP)</em>, it preserves geometric stability, enabling robust generation in low-bit settings.
           </p>
         </div>
       </div>
@@ -294,7 +294,7 @@
         <h2 class="title is-3" style="margin: 0.5rem 0;">Method</h2>
         <div class="content has-text-justified" style="padding: 0 0.5rem; margin: 0;">
           <p style="margin: 0;">
-            TrajeQ is the first quantization framework specifically engineered to preserve the geometric trajectory of Flow Matching models. In contrast to conventional approaches that minimize magnitude error and often lead to significant trajectory drift, TrajeQ prioritizes the integrity of vector field directionality. Our framework integrates two complementary mechanisms: Direction-Aware Quantization (DAQ), which dynamically adapts precision by detecting trajectory curvature in real-time, and Directional Bottleneck Preservation (DBP), which identifies and safeguards structural bottlenecks. This synergistic approach enables TrajeQ to achieve high-fidelity video generation without structural collapse.
+            TrajeQ is the first quantization framework specifically engineered to preserve the geometric trajectory of Flow Matching models. In contrast to conventional approaches that minimize magnitude error and often lead to significant trajectory drift, TrajeQ prioritizes the integrity of vector field directionality. Our framework integrates two complementary mechanisms: Curvature-Adaptive Quantization (CAQ), which dynamically adapts precision by detecting trajectory curvature in real-time, and Directional Bottleneck Preservation (DBP), which identifies and safeguards structural bottlenecks. This synergistic approach enables TrajeQ to achieve high-fidelity video generation without structural collapse.
           </p>
           <div class="column is-full" style="margin-top: 2rem;">
             <img src="./static/images/Figure1.jpg" alt="Figure 1: TrajeQ Overview" style="width: 100%; max-width: 1000px; margin: 0 auto; display: block;">
@@ -308,11 +308,11 @@
 
 <section class="section" style="padding: 2rem 0;">
   <div class="container is-max-widescreen" style="padding: 0 1rem; margin: 0;">
-    <!-- DAQ and DBP Side by Side -->
+    <!-- CAQ and DBP Side by Side -->
     <div class="columns" style="margin: 0;">
-      <!-- DAQ -->
+      <!-- CAQ -->
       <div class="column is-half" style="padding: 0 1rem 0 0;">
-        <h3 class="title is-4" style="margin-bottom: 1rem;">Direction-Aware Quantization (DAQ)</h3>
+        <h3 class="title is-4" style="margin-bottom: 1rem;">Curvature-Adaptive Quantization (CAQ)</h3>
         <div class="content" style="padding: 0; margin: 0;">
           <h5 style="margin-top: 0; margin-bottom: 0.5rem;"><strong>Motivation</strong></h5>
           <p style="margin: 0 0 1rem 0; font-size: 0.95rem; line-height: 1.6;">
@@ -321,11 +321,11 @@
           
           <h5 style="margin-top: 1rem; margin-bottom: 0.5rem;"><strong>Key Mechanism</strong></h5>
           <!-- <p style="margin: 0 0 1rem 0; font-size: 0.95rem; line-height: 1.6;">
-            DAQ monitors the trajectory's curvature in real-time by calculating the cosine angular shift between timesteps. When it detects sharp geometric turns (high curvature), it dynamically allocates higher precision to that specific step, compensating for the increased sensitivity.
+            CAQ monitors the trajectory's curvature in real-time by calculating the cosine angular shift between timesteps. When it detects sharp geometric turns (high curvature), it dynamically allocates higher precision to that specific step, compensating for the increased sensitivity.
           </p> -->
           <ul style="margin: 0; padding-left: 20px;">
             <li style="margin-bottom: 5px;">
-              <strong>Curvature Sensitivity Identification:</strong> DAQ utilizes a cosine-based curvature proxy to precisely locate geometric segments where the trajectory changes direction rapidly, identifying them as high-sensitivity intervals prone to error amplification.
+              <strong>Curvature Sensitivity Identification:</strong> CAQ utilizes a cosine-based curvature proxy to precisely locate geometric segments where the trajectory changes direction rapidly, identifying them as high-sensitivity intervals prone to error amplification.
             </li>
             <li>
               <strong>Adaptive Precision:</strong> When it detects sharp geometric turns (high curvature), it dynamically allocates higher precision to that specific step, compensating for the increased sensitivity.
@@ -334,7 +334,7 @@
           
           <h5 style="margin-top: 1rem; margin-bottom: 0.5rem;"><strong>Impact</strong></h5>
           <p style="margin: 0; font-size: 0.95rem; line-height: 1.6;">
-            By prioritizing directional integrity over simple magnitude preservation, DAQ effectively minimizes angular distortion. This ensures the generated video follows the correct deterministic path without diverging into noise or artifacts.
+            By prioritizing directional integrity over simple magnitude preservation, CAQ effectively minimizes angular distortion. This ensures the generated video follows the correct deterministic path without diverging into noise or artifacts.
           </p>
         </div>
       </div>
@@ -377,7 +377,7 @@
     <div class="columns" style="margin: 0;">
       <div class="column is-half" style="padding: 0 1rem 0 0;">
         <figure class="image" style="height: 300px; display: flex; align-items: center; justify-content: center;">
-          <img src="./static/images/DAQ.png" alt="DAQ Visualization" style="border-radius: 4px; max-height: 100%; max-width: 100%; object-fit: contain;">
+          <img src="./static/images/DAQ.png" alt="CAQ Visualization" style="border-radius: 4px; max-height: 100%; max-width: 100%; object-fit: contain;">
         </figure>
       </div>
       <div class="column is-half" style="padding: 0 1rem 1rem 1rem;">
