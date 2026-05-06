@@ -139,7 +139,7 @@
         <h2 class="title is-3">TL;DR</h2>
         <div class="content has-text-justified">
           <p style="color: #555; font-size: 1.05rem;">
-            We introduce <em><strong>TrajeQ</strong></em>, the first quantization framework for FM video. By integrating <em>Direction-Aware Quantization (DAQ)</em> and <em>Sensitive-Layer Preservation (SLP)</em>, it preserves geometric stability, enabling robust generation in low-bit settings.
+            We introduce <em><strong>TrajeQ</strong></em>, the first quantization framework for FM video. By integrating <em>Direction-Aware Quantization (DAQ)</em> and <em>Directional Bottleneck Preservation (DBP)</em>, it preserves geometric stability, enabling robust generation in low-bit settings.
           </p>
         </div>
       </div>
@@ -152,7 +152,7 @@
         <h2 class="title is-3">Abstract</h2>
         <div class="content has-text-justified">
           <p>
-           While flow matching (FM) dominates the field of high-quality video generation, its significant computational overhead presents a major obstacle to practical implementation. Although post-training quantization (PTQ) remains an established paradigm for efficient generation, we demonstrate that directly applying standard diffusion-centric methods causes severe performance degradation in FM. We identify a fundamental theoretical misalignment in how these paradigms respond to directional distortion. In contrast to stochastic (SDE) sampling, deterministic ODE trajectories cannot naturally recover from quantization error. This vulnerability induces critical angular distortion, driving the generation trajectory significantly off-manifold. To address this issue, we introduce <em><strong>TrajeQ</strong></em> to preserve the geometric integrity of the velocity field and ensure trajectory stability. Our approach introduces <em>Direction-Aware Quantization (DAQ)</em> to detect angular shifts across timesteps and mitigate geometric distortion via adaptive precision. We also integrate <em>Sensitive-Layer Preservation (SLP)</em> to protect structural bottlenecks and maintain the stability of the entire flow field. Experiments demonstrate that <em><strong>TrajeQ</strong></em> achieves SOTA VBench results and enables high-fidelity video generation even under extreme W4A4 and W3A6 quantization regimes. The code and video results are provided at <a href="https://anonymus-orange.github.io/" target="_blank">https://anonymus-orange.github.io/</a>.
+           While flow matching (FM) has emerged as a prominent paradigm for high-quality video generation, its significant computational overhead presents a major obstacle to practical implementation. Although post-training quantization (PTQ) is an established approach for efficient generation, existing PTQ methods primarily minimize reconstruction error in a magnitude-centric manner. This objective is misaligned with deterministic FM trajectories, where low-bit quantization introduces velocity-field orientation errors that can compound across integration steps and drive the generation trajectory off-manifold. To address this issue, we introduce <em><strong>TrajeQ</strong></em> to preserve the geometric integrity of the velocity field and reduce trajectory drift under low-bit quantization. Our approach introduces <em>Curvature-Adaptive Quantization (CAQ)</em> to detect angular shifts across timesteps and mitigate geometric distortion via adaptive precision. We also integrate <em>Directional Bottleneck Preservation (DBP)</em>, a sensitivity-guided precision assignment scheme that retains only the most vulnerable layers in full precision. Experiments demonstrate that <em><strong>TrajeQ</strong></em> achieves state-of-the-art VBench performance and maintains stable video generation under extreme W4A4 and W3A6 quantization regimes where existing methods collapse. The code and video results are provided at <a href="https://anonymus-orange.github.io/" target="_blank">https://anonymus-orange.github.io</a>.
           </p>
         </div>
       </div>
@@ -294,7 +294,7 @@
         <h2 class="title is-3" style="margin: 0.5rem 0;">Method</h2>
         <div class="content has-text-justified" style="padding: 0 0.5rem; margin: 0;">
           <p style="margin: 0;">
-            TrajeQ is the first quantization framework specifically engineered to preserve the geometric trajectory of Flow Matching models. In contrast to conventional approaches that minimize magnitude error and often lead to significant trajectory drift, TrajeQ prioritizes the integrity of vector field directionality. Our framework integrates two complementary mechanisms: Direction-Aware Quantization (DAQ), which dynamically adapts precision by detecting trajectory curvature in real-time, and Sensitive-Layer Preservation (SLP), which identifies and safeguards structural bottlenecks. This synergistic approach enables TrajeQ to achieve high-fidelity video generation without structural collapse.
+            TrajeQ is the first quantization framework specifically engineered to preserve the geometric trajectory of Flow Matching models. In contrast to conventional approaches that minimize magnitude error and often lead to significant trajectory drift, TrajeQ prioritizes the integrity of vector field directionality. Our framework integrates two complementary mechanisms: Direction-Aware Quantization (DAQ), which dynamically adapts precision by detecting trajectory curvature in real-time, and Directional Bottleneck Preservation (DBP), which identifies and safeguards structural bottlenecks. This synergistic approach enables TrajeQ to achieve high-fidelity video generation without structural collapse.
           </p>
           <div class="column is-full" style="margin-top: 2rem;">
             <img src="./static/images/Figure1.jpg" alt="Figure 1: TrajeQ Overview" style="width: 100%; max-width: 1000px; margin: 0 auto; display: block;">
@@ -308,7 +308,7 @@
 
 <section class="section" style="padding: 2rem 0;">
   <div class="container is-max-widescreen" style="padding: 0 1rem; margin: 0;">
-    <!-- DAQ and SLP Side by Side -->
+    <!-- DAQ and DBP Side by Side -->
     <div class="columns" style="margin: 0;">
       <!-- DAQ -->
       <div class="column is-half" style="padding: 0 1rem 0 0;">
@@ -339,9 +339,9 @@
         </div>
       </div>
       
-      <!-- SLP -->
+      <!-- DBP -->
       <div class="column is-half" style="padding: 0 0 0 1rem;">
-        <h3 class="title is-4" style="margin-bottom: 1rem;">Sensitive-Layer Preservation (SLP)</h3>
+        <h3 class="title is-4" style="margin-bottom: 1rem;">Directional Bottleneck Preservation (DBP)</h3>
         <div class="content" style="padding: 0; margin: 0;">
           <h5 style="margin-top: 0; margin-bottom: 0.5rem;"><strong>Motivation</strong></h5>
           <p style="margin: 0 0 1rem 0; font-size: 0.95rem; line-height: 1.6;">
@@ -350,14 +350,14 @@
           
           <h5 style="margin-top: 1rem; margin-bottom: 0.5rem;"><strong>Key Mechanism</strong></h5>
           <!-- <p style="margin: 0 0 1rem 0; font-size: 0.95rem; line-height: 1.6;">
-            We introduce a novel metric called "Directional Sensitivity (DS)" to pinpoint these vulnerable layers. Based on this analysis, SLP selectively preserves the most critical components—comprising less than 1% of total parameters—in FP16 precision while aggressively quantizing the rest.
+            We introduce a novel metric called "Directional Sensitivity (DS)" to pinpoint these vulnerable layers. Based on this analysis, DBP selectively preserves the most critical components—comprising less than 1% of total parameters—in FP16 precision while aggressively quantizing the rest.
           </p> -->
           <ul style="margin: 0; padding-left: 20px;">
             <li style="margin-bottom: 5px;">
               <strong>Layer Sensitivity Analysis:</strong> We introduce a novel metric called "Directional Sensitivity (DS)" to pinpoint vulnerable layers prone to angular distortion.
             </li>
             <li>
-              <strong>Strategic Preservation:</strong> Guided by upon metric, SLP selectively retains the identified structural bottlenecks in FP16 precision. This targeted protection neutralizes error amplification in critical components, allowing the majority of the model to be efficiently quantized without structural collapse.
+              <strong>Strategic Preservation:</strong> Guided by upon metric, DBP selectively retains the identified structural bottlenecks in FP16 precision. This targeted protection neutralizes error amplification in critical components, allowing the majority of the model to be efficiently quantized without structural collapse.
             </li>
         </ul>
           
@@ -382,7 +382,7 @@
       </div>
       <div class="column is-half" style="padding: 0 1rem 1rem 1rem;">
         <figure class="image" style="height: 300px; display: flex; align-items: center; justify-content: center;">
-          <img src="./static/images/SLP.png" alt="SLP Visualization" style="border-radius: 4px; max-height: 100%; max-width: 100%; object-fit: contain;">
+          <img src="./static/images/SLP.png" alt="DBP Visualization" style="border-radius: 4px; max-height: 100%; max-width: 100%; object-fit: contain;">
         </figure>
       </div>
     </div>
@@ -422,7 +422,7 @@
         <img src="./static/images/table3.png" alt="Table 3: Method Ablation Study" style="border-radius: 4px; max-width: 630px; margin: 0 auto; display: block;">
       </figure>
       <p style="margin-top: 1rem; font-size: 0.95rem; color: #555;">
-        Efficiency-Quality trade-off analysis on VBench. TrajeQ significantly outperforms baselines in both perceptual (LPIPS) and structural (SSIM) metrics at W3A6. With the highest Q-Score ( <i>SSIM</i> / <i>Memory</i> ) of 1.29, <strong>our method converts memory resources into substantial fidelity gains, overcoming the limitations of standard quantization methods.</strong>
+        Efficiency-quality trade-off analysis on VBench. Under the challenging W3A6 regime, TrajeQ consistently surpasses existing baselines across both perceptual (LPIPS) and structural (SSIM) metrics, <strong>establishing a more favorable balance between aggressive compression and generation fidelity.</strong>
       </p>
     </div>
   </div>
@@ -688,16 +688,8 @@
         <h2 class="title is-3">Future Work</h2>
         <div class="content has-text-justified">
           <p>
-            We aim to extend TrajeQ to 3D Flow Matching, bridging the gap between high-fidelity spatial generation and efficient deployment.
+            While TrajeQ analyzes the geometric trajectory of velocity vectors, future work will investigate how quantization alters internal feature representations, especially whether it disrupts the geometry of superposed features.
           </p>
-          <ul>
-            <li>
-              <strong>3D Geometric Quantization:</strong> Adapting DAQ to preserve structural and topological integrity within high-dimensional 3D manifolds.
-            </li>
-            <li>
-              <strong>Extreme On-Device Efficiency:</strong> Unlocking real-time 3D generation on edge devices by leveraging robust W4A4 compression.
-            </li>
-          </ul>
         </div>
       </div>
     </div>
