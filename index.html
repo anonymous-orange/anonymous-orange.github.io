@@ -63,11 +63,11 @@
           <h1 class="title is-1 publication-title">TrajeQ: Trajectory-Preserving Flow Matching Quantization for Low-bit Video Generation</h1>
           <div class="is-size-5 publication-authors">
             <span class="author-block">
-              <a href="">Anonymus Authors</a><sup>1</sup></span>
+              <a href="">Anonymous Authors</a><sup>1</sup></span>
           </div>
 
           <div class="is-size-5 publication-authors">
-            <span class="author-block"><sup>1</sup>Anonymus</span>
+            <span class="author-block"><sup>1</sup>Anonymous</span>
           </div>
 
           <div class="column has-text-centered">
@@ -152,7 +152,7 @@
         <h2 class="title is-3">Abstract</h2>
         <div class="content has-text-justified">
           <p>
-           While flow matching (FM) has emerged as a prominent paradigm for high-quality video generation, its significant computational overhead presents a major obstacle to practical implementation. Although post-training quantization (PTQ) is an established approach for efficient generation, existing PTQ methods primarily minimize reconstruction error in a magnitude-centric manner. This objective is misaligned with deterministic FM trajectories, where low-bit quantization introduces velocity-field orientation errors that can compound across integration steps and drive the generation trajectory off-manifold. To address this issue, we introduce <em><strong>TrajeQ</strong></em> to preserve the geometric integrity of the velocity field and reduce trajectory drift under low-bit quantization. Our approach introduces <em>Curvature-Adaptive Quantization (CAQ)</em> to detect angular shifts across timesteps and mitigate geometric distortion via adaptive precision. We also integrate <em>Directional Bottleneck Preservation (DBP)</em>, a sensitivity-guided precision assignment scheme that retains only the most vulnerable layers in full precision. Experiments demonstrate that <em><strong>TrajeQ</strong></em> achieves state-of-the-art VBench performance and maintains stable video generation under extreme W4A4 and W3A6 quantization regimes where existing methods collapse. We provide the code in the supplementary material and the video results on the <a href="https://anonymous-orange.github.io/" target="_blank">https://anonymous-orange.github.io</a>.
+           While flow matching (FM) has emerged as a prominent paradigm for high-quality video generation, its significant computational overhead presents a major obstacle to practical implementation. Although post-training quantization (PTQ) is an established approach for efficient generation, existing PTQ methods primarily minimize reconstruction error in a magnitude-centric manner. This objective is misaligned with deterministic FM trajectories, where low-bit quantization introduces velocity-field orientation errors that can compound across integration steps and cause deviations from the full-precision trajectory. To address this issue, we introduce <em><strong>TrajeQ</strong></em> to preserve the geometric integrity of the velocity field and reduce trajectory drift under low-bit quantization. Our approach introduces <em>Curvature-Adaptive Quantization (CAQ)</em> to detect angular shifts across timesteps and mitigate geometric distortion via adaptive precision. We also integrate <em>Directional Bottleneck Preservation (DBP)</em>, a sensitivity-guided precision assignment scheme that retains only the most vulnerable layers in full precision. Experiments demonstrate that <em><strong>TrajeQ</strong></em> achieves state-of-the-art VBench performance and maintains stable video generation under extreme W4A4 and W3A6 quantization regimes where existing methods collapse. We provide the code in the supplementary material and the video results on the <a href="https://anonymous-orange.github.io/" target="_blank">https://anonymous-orange.github.io</a>.
           </p>
         </div>
       </div>
@@ -294,7 +294,7 @@
         <h2 class="title is-3" style="margin: 0.5rem 0;">Method</h2>
         <div class="content has-text-justified" style="padding: 0 0.5rem; margin: 0;">
           <p style="margin: 0;">
-            TrajeQ is the first quantization framework specifically engineered to preserve the geometric trajectory of Flow Matching models. In contrast to conventional approaches that minimize magnitude error and often lead to significant trajectory drift, TrajeQ prioritizes the integrity of vector field directionality. Our framework integrates two complementary mechanisms: Curvature-Adaptive Quantization (CAQ), which dynamically adapts precision by detecting trajectory curvature in real-time, and Directional Bottleneck Preservation (DBP), which identifies and safeguards structural bottlenecks. This synergistic approach enables TrajeQ to achieve high-fidelity video generation without structural collapse.
+            TrajeQ is the first quantization framework specifically engineered to preserve the geometric trajectory of Flow Matching models. In contrast to conventional approaches that minimize magnitude error and often lead to significant trajectory drift, TrajeQ prioritizes the integrity of vector field directionality. Our framework integrates two complementary mechanisms: Curvature-Adaptive Quantization (CAQ), which dynamically adapts precision using inter-step changes in activation direction, and Directional Bottleneck Preservation (DBP), which identifies and safeguards structural bottlenecks. This synergistic approach enables TrajeQ to achieve high-fidelity video generation without structural collapse.
           </p>
           <div class="column is-full" style="margin-top: 2rem;">
             <img src="./static/images/Figure1.jpg" alt="Figure 1: TrajeQ Overview" style="width: 100%; max-width: 1000px; margin: 0 auto; display: block;">
@@ -316,25 +316,22 @@
         <div class="content" style="padding: 0; margin: 0;">
           <h5 style="margin-top: 0; margin-bottom: 0.5rem;"><strong>Motivation</strong></h5>
           <p style="margin: 0 0 1rem 0; font-size: 0.95rem; line-height: 1.6;">
-            Flow Matching trajectories are geometrically non-uniform, containing high-curvature regions that are intrinsically unstable. Standard methods fail to account for this geometric nuance, causing significant drift when these critical "inflection points" are under-resolved by static quantization.
+            Flow Matching trajectories exhibit varying degrees of directional change during sampling. CAQ uses changes in activation direction to guide timestep-wise precision allocation, aiming to reduce trajectory drift under low-bit quantization.
           </p>
           
           <h5 style="margin-top: 1rem; margin-bottom: 0.5rem;"><strong>Key Mechanism</strong></h5>
-          <!-- <p style="margin: 0 0 1rem 0; font-size: 0.95rem; line-height: 1.6;">
-            CAQ monitors the trajectory's curvature in real-time by calculating the cosine angular shift between timesteps. When it detects sharp geometric turns (high curvature), it dynamically allocates higher precision to that specific step, compensating for the increased sensitivity.
-          </p> -->
           <ul style="margin: 0; padding-left: 20px;">
             <li style="margin-bottom: 5px;">
-              <strong>Curvature Sensitivity Identification:</strong> CAQ utilizes a cosine-based curvature proxy to precisely locate geometric segments where the trajectory changes direction rapidly, identifying them as high-sensitivity intervals prone to error amplification.
+              <strong>Timestep Selection:</strong> CAQ computes the cosine distance between consecutive flattened activations at each quantized layer to identify timesteps for additional precision.
             </li>
             <li>
-              <strong>Adaptive Precision:</strong> When it detects sharp geometric turns (high curvature), it dynamically allocates higher precision to that specific step, compensating for the increased sensitivity.
+              <strong>Adaptive Precision:</strong> When this score exceeds the threshold, CAQ increases the activation bit-width by one for the current layer and timestep.
             </li>
         </ul>
           
           <h5 style="margin-top: 1rem; margin-bottom: 0.5rem;"><strong>Impact</strong></h5>
           <p style="margin: 0; font-size: 0.95rem; line-height: 1.6;">
-            By prioritizing directional integrity over simple magnitude preservation, CAQ effectively minimizes angular distortion. This ensures the generated video follows the correct deterministic path without diverging into noise or artifacts.
+            CAQ allocates additional precision where activation directions change sharply. In our ablations, this allocation improves generation quality over random boosting at the same number of boosted timesteps.
           </p>
         </div>
       </div>
@@ -345,7 +342,7 @@
         <div class="content" style="padding: 0; margin: 0;">
           <h5 style="margin-top: 0; margin-bottom: 0.5rem;"><strong>Motivation</strong></h5>
           <p style="margin: 0 0 1rem 0; font-size: 0.95rem; line-height: 1.6;">
-            Standard error metrics like MSE often overlook layers with small activation magnitudes. However, our theoretical analysis reveals that these "structural bottlenecks" are geometrically unstable; even minimal quantization noise in these layers triggers disproportionately large angular deviations.
+            MSE can underemphasize angular distortion in layers with small activation norms. Our theoretical analysis shows that the same absolute perturbation can cause larger angular deviations at smaller activation norms, motivating sensitivity-guided layer preservation.
           </p>
           
           <h5 style="margin-top: 1rem; margin-bottom: 0.5rem;"><strong>Key Mechanism</strong></h5>
@@ -357,7 +354,7 @@
               <strong>Layer Sensitivity Analysis:</strong> We introduce a novel metric called "Directional Sensitivity (DS)" to pinpoint vulnerable layers prone to angular distortion.
             </li>
             <li>
-              <strong>Strategic Preservation:</strong> Guided by upon metric, DBP selectively retains the identified structural bottlenecks in FP16 precision. This targeted protection neutralizes error amplification in critical components, allowing the majority of the model to be efficiently quantized without structural collapse.
+              <strong>Strategic Preservation:</strong> Guided by DS rankings, DBP selectively retains high-sensitivity layers in FP16 under a fixed parameter budget. This targeted preservation protects vulnerable components while keeping the majority of the model quantized.
             </li>
         </ul>
           
