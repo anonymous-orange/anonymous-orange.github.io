@@ -152,7 +152,7 @@
         <h2 class="title is-3">Abstract</h2>
         <div class="content has-text-justified">
           <p>
-           While flow matching (FM) has emerged as a prominent paradigm for high-quality video generation, its significant computational overhead presents a major obstacle to practical implementation. Although post-training quantization (PTQ) is an established approach for efficient generation, existing PTQ methods primarily minimize reconstruction error in a magnitude-centric manner. This objective is misaligned with deterministic FM trajectories, where low-bit quantization introduces velocity-field orientation errors that can compound across integration steps and cause deviations from the full-precision trajectory. To address this issue, we introduce <em><strong>TrajeQ</strong></em> to preserve the geometric integrity of the velocity field and reduce trajectory drift under low-bit quantization. Our approach introduces <em>Curvature-Adaptive Quantization (CAQ)</em> to detect angular shifts across timesteps and mitigate geometric distortion via adaptive precision. We also integrate <em>Directional Bottleneck Preservation (DBP)</em>, a sensitivity-guided precision assignment scheme that retains only the most vulnerable layers in full precision. Experiments demonstrate that <em><strong>TrajeQ</strong></em> achieves state-of-the-art VBench performance and maintains stable video generation under extreme W4A4 and W3A6 quantization regimes where existing methods collapse. We provide the code in the supplementary material and the video results on the <a href="https://anonymous-orange.github.io/" target="_blank">https://anonymous-orange.github.io</a>.
+           While flow matching (FM) has emerged as a prominent paradigm for high-quality video generation, its significant computational overhead presents a major obstacle to practical implementation. Although post-training quantization (PTQ) is an established approach for efficient generation, existing PTQ methods primarily minimize reconstruction error in a magnitude-centric manner. This objective is misaligned with deterministic FM trajectories, where low-bit quantization introduces velocity-field orientation errors that can compound across integration steps and cause deviations from the full-precision trajectory. To address this issue, we introduce <em><strong>TrajeQ</strong></em> to preserve the geometric integrity of the velocity field and reduce trajectory drift under low-bit quantization. Our approach introduces <em>Curvature-Adaptive Quantization (CAQ)</em> to detect angular shifts across timesteps and mitigate geometric distortion via adaptive precision. We also integrate <em>Directional Bottleneck Preservation (DBP)</em>, a sensitivity-guided precision assignment scheme that retains only the most vulnerable layers in full precision. Experiments demonstrate that <em><strong>TrajeQ</strong></em> achieves state-of-the-art VBench performance and maintains stable video generation under extreme W4A4 and W3A6 quantization regimes where existing methods collapse. We provide the code in the supplementary material and additional video results on the <a href="https://anonymous-orange.github.io/" target="_blank">Project Page</a>.
           </p>
         </div>
       </div>
@@ -312,55 +312,52 @@
     <div class="columns" style="margin: 0;">
       <!-- CAQ -->
       <div class="column is-half" style="padding: 0 1rem 0 0;">
-        <h3 class="title is-4" style="margin-bottom: 1rem;">Curvature-Adaptive Quantization (CAQ)</h3>
+        <h3 class="title is-4" style="margin-bottom: 1rem;">Curvature-Adaptive Quantization<br>(CAQ)</h3>
         <div class="content" style="padding: 0; margin: 0;">
           <h5 style="margin-top: 0; margin-bottom: 0.5rem;"><strong>Motivation</strong></h5>
           <p style="margin: 0 0 1rem 0; font-size: 0.95rem; line-height: 1.6;">
-            Flow Matching trajectories exhibit varying degrees of directional change during sampling. CAQ uses changes in activation direction to guide timestep-wise precision allocation, aiming to reduce trajectory drift under low-bit quantization.
+            Activation directions can change sharply during flow-matching sampling. Since full-precision reference velocities are unavailable during quantized inference, CAQ uses inter-step activation changes as a proxy to guide precision allocation and reduce trajectory drift.
           </p>
           
           <h5 style="margin-top: 1rem; margin-bottom: 0.5rem;"><strong>Key Mechanism</strong></h5>
           <ul style="margin: 0; padding-left: 20px;">
             <li style="margin-bottom: 5px;">
-              <strong>Timestep Selection:</strong> CAQ computes the cosine distance between consecutive flattened activations at each quantized layer to identify timesteps for additional precision.
+              <strong>Timestep Selection:</strong> At each quantized layer, CAQ computes the cosine distance between the current flattened activation and its cached value from the preceding timestep. This directional-shift score identifies timesteps for additional precision.
             </li>
             <li>
-              <strong>Adaptive Precision:</strong> When this score exceeds the threshold, CAQ increases the activation bit-width by one for the current layer and timestep.
+              <strong>Adaptive Precision:</strong> When the score exceeds the threshold of 0.25, CAQ increases the activation bit-width by one. Precision is selected independently for each layer and timestep and applies uniformly to the entire activation tensor.
             </li>
         </ul>
           
           <h5 style="margin-top: 1rem; margin-bottom: 0.5rem;"><strong>Impact</strong></h5>
           <p style="margin: 0; font-size: 0.95rem; line-height: 1.6;">
-            CAQ allocates additional precision where activation directions change sharply. In our ablations, this allocation improves generation quality over random boosting at the same number of boosted timesteps.
+            CAQ directs additional precision toward sharp activation-direction changes. In our ablations, this allocation improves generation quality over random boosting with the same number of boosted timesteps, supporting directional shifts as a useful selection signal.
           </p>
         </div>
       </div>
       
       <!-- DBP -->
       <div class="column is-half" style="padding: 0 0 0 1rem;">
-        <h3 class="title is-4" style="margin-bottom: 1rem;">Directional Bottleneck Preservation (DBP)</h3>
+        <h3 class="title is-4" style="margin-bottom: 1rem;">Directional Bottleneck Preservation<br>(DBP)</h3>
         <div class="content" style="padding: 0; margin: 0;">
           <h5 style="margin-top: 0; margin-bottom: 0.5rem;"><strong>Motivation</strong></h5>
           <p style="margin: 0 0 1rem 0; font-size: 0.95rem; line-height: 1.6;">
-            MSE can underemphasize angular distortion in layers with small activation norms. Our theoretical analysis shows that the same absolute perturbation can cause larger angular deviations at smaller activation norms, motivating sensitivity-guided layer preservation.
+            MSE can underemphasize angular distortion in layers with small activation norms. Our analysis shows that the same small orthogonal perturbation can cause larger angular deviations at smaller norms, motivating sensitivity-guided layer preservation.
           </p>
           
           <h5 style="margin-top: 1rem; margin-bottom: 0.5rem;"><strong>Key Mechanism</strong></h5>
-          <!-- <p style="margin: 0 0 1rem 0; font-size: 0.95rem; line-height: 1.6;">
-            We introduce a novel metric called "Directional Sensitivity (DS)" to pinpoint these vulnerable layers. Based on this analysis, DBP selectively preserves the most critical components—comprising less than 1% of total parameters—in FP16 precision while aggressively quantizing the rest.
-          </p> -->
           <ul style="margin: 0; padding-left: 20px;">
             <li style="margin-bottom: 5px;">
-              <strong>Layer Sensitivity Analysis:</strong> We introduce a novel metric called "Directional Sensitivity (DS)" to pinpoint vulnerable layers prone to angular distortion.
+              <strong>Layer Sensitivity Analysis:</strong> Before inference, DBP profiles full-precision and quantized activations across prompts and timesteps. Directional Sensitivity (DS) scores each layer using the ratio of mean angular error to mean squared error, with a stabilized denominator.
             </li>
             <li>
-              <strong>Strategic Preservation:</strong> Guided by DS rankings, DBP selectively retains high-sensitivity layers in FP16 under a fixed parameter budget. This targeted preservation protects vulnerable components while keeping the majority of the model quantized.
+              <strong>Strategic Preservation:</strong> DBP ranks quantizable layers by DS and preserves the highest-sensitivity subset in FP16 under a fixed parameter budget. Selected layers concentrate in embedding and normalization modules, rather than being chosen by manually specified types.
             </li>
         </ul>
           
           <h5 style="margin-top: 1rem; margin-bottom: 0.5rem;"><strong>Impact</strong></h5>
           <p style="margin: 0; font-size: 0.95rem; line-height: 1.6;">
-            This strategy prevents catastrophic quality degradation, such as color collapse or texture washout. It enables the model to maintain high-fidelity structural consistency and vivid details even under extreme low-bit quantization regimes.
+            In our analysis, preserved layers account for less than 1% of total parameters. This targeted allocation suppresses quantization-induced distortion in vulnerable components while enabling low-bit quantization elsewhere with minimal computational overhead.
           </p>
         </div>
       </div>
@@ -412,14 +409,14 @@
       </p>
     </div>
     
-    <!-- Table 3 -->
+    <!-- Figure 6 -->
     <div style="margin-bottom: 3rem;">
-      <h4 class="title is-5" style="margin-bottom: 1rem;">Table 3: Computational Cost Analysis</h4>
+      <h4 class="title is-5" style="margin-bottom: 1rem;">Figure 6: Visual Ablation of Structural Bottlenecks</h4>
       <figure class="image">
-        <img src="./static/images/table3.png" alt="Table 3: Method Ablation Study" style="border-radius: 4px; max-width: 630px; margin: 0 auto; display: block;">
+        <img src="./static/images/Fig6.png" alt="Figure 6: W4A6 visual comparison of quantized and FP16 embedding and normalization layers" style="border-radius: 4px; width: 100%; margin: 0 auto; display: block;">
       </figure>
       <p style="margin-top: 1rem; font-size: 0.95rem; color: #555;">
-        Efficiency-quality trade-off analysis on VBench. Under the challenging W3A6 regime, TrajeQ consistently surpasses existing baselines across both perceptual (LPIPS) and structural (SSIM) metrics, <strong>establishing a more favorable balance between aggressive compression and generation fidelity.</strong>
+        Visual ablation under W4A6 quantization compares quantizing both embedding and normalization layers, quantizing either group alone, and preserving both in FP16. Quantizing these components introduces color artifacts or texture degradation in this example. <strong>Preserving both in FP16 yields higher visual fidelity, illustrating the benefit of protecting structural bottlenecks.</strong>
       </p>
     </div>
   </div>
